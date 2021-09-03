@@ -50,3 +50,14 @@ func Parse(expression []byte) []Node {
 
 	return nodes
 }
+
+func Eval(nodes []Node) int {
+	var sum int
+	for i := 0; i < len(nodes); i++ {
+		if nodes[i].Kind == PlusKind {
+			sum += nodes[i-1].Value + nodes[i+1].Value
+			i++
+		}
+	}
+	return sum
+}
