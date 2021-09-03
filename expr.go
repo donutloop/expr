@@ -3,6 +3,7 @@ package expr
 const (
 	NumberKind = iota
 	PlusKind
+	MinusKind
 )
 
 type Node struct {
@@ -13,6 +14,7 @@ type Node struct {
 const (
 	Whitespace byte = 32
 	Plus       byte = 43
+	Minus       byte = 45
 )
 
 func Parse(expression []byte) []Node {
@@ -27,7 +29,9 @@ func Parse(expression []byte) []Node {
 
 	var nodes []Node
 	for i := len(cleanedExpression) - 1; i >= 0; i-- {
-		if cleanedExpression[i] == Plus {
+		if cleanedExpression[i] == Minus {
+			nodes = append(nodes, Node{Kind: MinusKind})
+		}else if cleanedExpression[i] == Plus {
 			nodes = append(nodes, Node{Kind: PlusKind})
 		} else if cleanedExpression[i] >= 48 && cleanedExpression[i] <= 57 {
 			n := Node{Kind: NumberKind}
@@ -54,12 +58,14 @@ func Parse(expression []byte) []Node {
 }
 
 func Eval(nodes []Node) int {
-	var sum int
-	for i := 0; i < len(nodes); i++ {
+	sum := nodes[0].Value
+	for i := 1; i < len(nodes); i++ {
 		if nodes[i].Kind == PlusKind {
-			sum += nodes[i-1].Value + nodes[i+1].Value
-			i++
+			sum += nodes[i+1].Value
+		} else if nodes[i].Kind == MinusKind {
+			sum -= nodes[i+1].Value
 		}
+		i++
 	}
 	return sum
 }
