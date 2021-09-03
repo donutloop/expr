@@ -13,6 +13,11 @@ func TestParse(t *testing.T) {
 			expression: "9 + 9",
 			value: 18,
 		},
+		{
+			name: "simple expression",
+			expression: "50 + 50",
+			value: 100,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

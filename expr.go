@@ -35,7 +35,7 @@ func Parse(expression []byte) []Node {
 			sum = int(cleanedExpression[i]) - 48
 			i--
 			for i >= 0 {
-				if cleanedExpression[i] == NumberKind {
+				if cleanedExpression[i] >= 48 && cleanedExpression[i] <= 57 {
 					sum += (int(cleanedExpression[i]) - 48) * 10
 					i--
 				} else {
