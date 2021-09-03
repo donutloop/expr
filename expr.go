@@ -34,10 +34,12 @@ func Parse(expression []byte) []Node {
 			var sum int
 			sum = int(cleanedExpression[i]) - 48
 			i--
+			norm := 10
 			for i >= 0 {
 				if cleanedExpression[i] >= 48 && cleanedExpression[i] <= 57 {
-					sum += (int(cleanedExpression[i]) - 48) * 10
+					sum += (int(cleanedExpression[i]) - 48) * norm
 					i--
+					norm = norm * 10
 				} else {
 					i++
 					break

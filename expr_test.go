@@ -18,6 +18,16 @@ func TestParse(t *testing.T) {
 			expression: "50 + 50",
 			value: 100,
 		},
+		{
+			name: "simple expression",
+			expression: "500 + 500",
+			value: 1000,
+		},
+		{
+			name: "simple expression",
+			expression: "50000000000000 + 50000000000000",
+			value: 100000000000000,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
