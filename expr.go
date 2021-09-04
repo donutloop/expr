@@ -8,17 +8,20 @@ const (
 	NumberKind = iota
 	PlusKind
 	MinusKind
+	MultiplyKind
 )
 
 type Node struct {
 	Kind  int
 	Value int
+	Priority int
 }
 
 const (
 	Whitespace byte = 32
+	Multiply   byte = 42
 	Plus       byte = 43
-	Minus       byte = 45
+	Minus      byte = 45
 )
 
 func Parse(expression []byte) *list.List {
@@ -35,7 +38,9 @@ func Parse(expression []byte) *list.List {
 	for i := len(cleanedExpression) - 1; i >= 0; i-- {
 		if cleanedExpression[i] == Minus {
 			nodes.PushBack(Node{Kind: MinusKind})
-		}else if cleanedExpression[i] == Plus {
+		} else if cleanedExpression[i] == Multiply {
+			nodes.PushBack(Node{Kind: MultiplyKind, Priority: 1})
+		} else if cleanedExpression[i] == Plus {
 			nodes.PushBack(Node{Kind: PlusKind})
 		} else if cleanedExpression[i] >= 48 && cleanedExpression[i] <= 57 {
 			n := Node{Kind: NumberKind}
@@ -61,9 +66,26 @@ func Parse(expression []byte) *list.List {
 	return nodes
 }
 
-// 1 + 2 * 1 * (1 * 1) + 1 + 1
-
 func Eval(nodes *list.List) int {
+	for e := nodes.Back(); e != nil; e = e.Prev() {
+		node := e.Value.(Node)
+		if node.Priority == 1 {
+			if node.Kind == MultiplyKind {
+				eA := e.Prev()
+				nodeA := eA.Value.(Node)
+				eb := e.Next()
+				nodeB := eb.Value.(Node)
+				sum := nodeA.Value * nodeB.Value
+
+				nodes.Remove(eb)
+				nodes.Remove(eA)
+				newNode := nodes.InsertBefore(Node{Kind: NumberKind, Value: sum}, e)
+				nodes.Remove(e)
+				e = newNode
+			}
+		}
+	}
+
 	value := nodes.Back()
 	sum := value.Value.(Node).Value
 	value = value.Prev()
