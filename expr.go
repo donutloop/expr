@@ -12,8 +12,8 @@ const (
 )
 
 type Node struct {
-	Kind  int
-	Value int
+	Kind     int
+	Value    int
 	Priority int
 }
 
