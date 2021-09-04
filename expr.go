@@ -1,5 +1,9 @@
 package expr
 
+import (
+	"container/list"
+)
+
 const (
 	NumberKind = iota
 	PlusKind
@@ -17,8 +21,9 @@ const (
 	Minus       byte = 45
 )
 
-func Parse(expression []byte) []Node {
+func Parse(expression []byte) *list.List {
 
+	nodes := list.New()
 	cleanedExpression := make([]byte, 0)
 	for i := 0; i < len(expression); i++ {
 		if expression[i] == Whitespace {
@@ -27,12 +32,11 @@ func Parse(expression []byte) []Node {
 		cleanedExpression = append(cleanedExpression, expression[i])
 	}
 
-	var nodes []Node
 	for i := len(cleanedExpression) - 1; i >= 0; i-- {
 		if cleanedExpression[i] == Minus {
-			nodes = append(nodes, Node{Kind: MinusKind})
+			nodes.PushBack(Node{Kind: MinusKind})
 		}else if cleanedExpression[i] == Plus {
-			nodes = append(nodes, Node{Kind: PlusKind})
+			nodes.PushBack(Node{Kind: PlusKind})
 		} else if cleanedExpression[i] >= 48 && cleanedExpression[i] <= 57 {
 			n := Node{Kind: NumberKind}
 			var sum int
@@ -50,22 +54,30 @@ func Parse(expression []byte) []Node {
 				}
 			}
 			n.Value = sum
-			nodes = append(nodes, n)
+			nodes.PushBack(n)
 		}
 	}
 
 	return nodes
 }
 
-func Eval(nodes []Node) int {
-	sum := nodes[0].Value
-	for i := 1; i < len(nodes); i++ {
-		if nodes[i].Kind == PlusKind {
-			sum += nodes[i+1].Value
-		} else if nodes[i].Kind == MinusKind {
-			sum -= nodes[i+1].Value
+// 1 + 2 * 1 * (1 * 1) + 1 + 1
+
+func Eval(nodes *list.List) int {
+	value := nodes.Back()
+	sum := value.Value.(Node).Value
+	value = value.Prev()
+	for e := value; e != nil; e = e.Prev() {
+		node := e.Value.(Node)
+		if node.Kind == PlusKind {
+			e = e.Prev()
+			node = e.Value.(Node)
+			sum += node.Value
+		} else if node.Kind == MinusKind {
+			e = e.Prev()
+			node = e.Value.(Node)
+			sum -= node.Value
 		}
-		i++
 	}
 	return sum
 }
