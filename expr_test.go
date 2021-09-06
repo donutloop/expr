@@ -1,6 +1,8 @@
 package expr
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParse(t *testing.T) {
 	tests := []struct {
@@ -9,6 +11,18 @@ func TestParse(t *testing.T) {
 		value      int
 	}{
 		{
+			name:       "const a = 9",
+			expression: "const a = 9",
+			value:      0,
+		},
+		{
+			name: "const a = 10 and eval",
+			expression: `const a = 10
+12 - a
+`,
+			value: 2,
+		},
+		{
 			name:       "simple minus expression",
 			expression: "9 - 9",
 			value:      0,
@@ -16,7 +30,7 @@ func TestParse(t *testing.T) {
 		{
 			name:       "simple expression",
 			expression: "9 * 7 + 1 + 3 * 5",
-			value:      85,
+			value:      79,
 		},
 		{
 			name:       "multiple minus expression",
@@ -62,7 +76,8 @@ func TestParse(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			nodes := Parse([]byte(test.expression))
-			sum := Eval(nodes)
+			var sum int
+			sum = Eval(nodes)
 			t.Logf("sum: %#v", sum)
 			if test.value != sum {
 				t.Fatalf("sum is bad, got:%v, want:%v", sum, test.value)
